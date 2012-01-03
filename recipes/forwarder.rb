@@ -1,7 +1,21 @@
 #
 # Cookbook Name:: splunk
-# Recipe:: forwarder_new
+# Recipe:: forwarder
+# 
+# Copyright 2011-2012, BBY Solutions, Inc.
+# Copyright 2011-2012, Opscode, Inc.
 #
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 directory "/opt" do
@@ -11,21 +25,19 @@ directory "/opt" do
 end
 
 splunk_cmd = "#{node[:splunk][:forwarder_home]}/bin/splunk"
-splunk_package_version = "splunkforwarder-#{node[:splunk][:forwarder_version]}-#{node[:splunk][:forwarder_build]}"
 
-splunk_file = splunk_package_version + 
-  case node[:platform]
+splunk_file = case node[:platform]
   when "centos","redhat","fedora"
     if node[:kernel][:machine] == "x86_64"
-      "-linux-2.6-x86_64.rpm"
+      splunk_file = "splunkforwarder-#{node[:splunk][:forwarder_version]}-#{node[:splunk][:forwarder_build]}-linux-2.6-x86_64.rpm"
     else
-      ".i386.rpm"
+      splunk_file = "splunkforwarder-#{node[:splunk][:forwarder_version]}-#{node[:splunk][:forwarder_build]}.i386.rpm"
     end
   when "debian","ubuntu"
     if node[:kernel][:machine] == "x86_64"
-      "-linux-2.6-amd64.deb"
+      splunk_file = "splunkforwarder-#{node[:splunk][:forwarder_version]}-#{node[:splunk][:forwarder_build]}-linux-2.6-amd64.deb"
     else
-      "-linux-2.6-intel.deb"
+      splunk_file = "splunkforwarder-#{node[:splunk][:forwarder_version]}-#{node[:splunk][:forwarder_build]}-linux-2.6-intel.deb"
     end
   end
 
@@ -34,18 +46,21 @@ remote_file "/opt/#{splunk_file}" do
   action :create_if_missing
 end
 
-package splunk_package_version do
-  source "/opt/#{splunk_file}"
-  case node[:platform]
+case node[:platform]
   when "centos","redhat","fedora"
-    provider Chef::Provider::Package::Rpm
+    rpm_package "/opt/#{splunk_file}" do
+      source "/opt/#{splunk_file}"
+    end
   when "debian","ubuntu"
-    provider Chef::Provider::Package::Dpkg
+    dpkg_package "/opt/#{splunk_file}" do
+      source "/opt/#{splunk_file}"
+    end
   end
-end
 
 execute "#{splunk_cmd} start --accept-license --answer-yes" do
-  not_if "#{node[:splunk][:forwarder_home]}/bin/splunk status | grep 'splunkd is running'"
+  not_if do
+    `#{splunk_cmd} status | grep 'splunkd'`.chomp! =~ /^splunkd is running/
+  end
 end
 
 execute "#{splunk_cmd} enable boot-start" do
@@ -77,7 +92,7 @@ template "#{node[:splunk][:forwarder_home]}/etc/system/local/outputs.conf" do
 	notifies :restart, resources(:service => "splunk")
 end
 
-["inputs","limits"].each do |cfg|
+["limits"].each do |cfg|
   template "#{node[:splunk][:forwarder_home]}/etc/system/local/#{cfg}.conf" do
    	source "forwarder/#{cfg}.conf.erb"
    	owner "root"
@@ -87,18 +102,27 @@ end
    end
 end
 
+# Find the inputs file to move.  There will be the default and then we will over-write it as necessary
+
+node.cookbook_collection["#{node[:splunk][:cookbook_name]}"].template_filenames.each do |filename|
+ inputsfile = "forwarder/#{node[:splunk][:forwarder_config_folder]}/#{node[:splunk][:forwarder_role]}.inputs.conf.erb"
+  # Did it this way so we don't get spammed with stupid crap for each role
+  if filename == inputsfile
+    template "Moving inputs file for role: #{node[:splunk][:forwarder_role]}" do
+ 	    path "#{node[:splunk][:forwarder_home]}/etc/system/local/inputs.conf"
+	    source "#{inputsfile}"
+      owner "root"
+      group "root"
+      mode "0640"
+      notifies :restart, resources(:service => "splunk")
+    end
+  end
+end
+
+
 template "/etc/init.d/splunk" do
   source "forwarder/splunk.erb"
   mode "0755"
   owner "root"
   group "root"
-  variables :splunk_cmd => splunk_cmd
 end
-
-# We own splunk with root, this won't work on Ubuntu because of secure_path  
-#  template "/etc/profile.d/splunk.sh" do
-#      source "profile-d-sh.erb"
-#      mode "0755"
-#      owner "root"
-#      group "root"
-#  end

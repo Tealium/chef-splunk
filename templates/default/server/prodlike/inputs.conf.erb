@@ -1,5 +1,5 @@
 [default]
-host = <%= node['fqdn'] %>
+host = <%= node[:ec2][:instance_id] %>-splunk
 
 [monitor://$SPLUNK_HOME/var/log/splunk]
 
@@ -8,6 +8,3 @@ ignoreOlderThan = 30d
 disabled = 0
 index = default
 crcSalt = <SOURCE>
-
-
-

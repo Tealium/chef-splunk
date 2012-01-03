@@ -8,22 +8,22 @@ RETVAL=0
 
 splunk_start() {
   echo Starting Splunk...
-   <%= @splunk_cmd %> start --no-prompt --answer-yes
+  "/opt/splunk/bin/splunk" start --no-prompt --answer-yes
   RETVAL=$?
 }
 splunk_stop() {
   echo Stopping Splunk...
-   <%= @splunk_cmd %> stop 
+  "/opt/splunk/bin/splunk" stop 
   RETVAL=$?
 }
 splunk_restart() {
   echo Restarting Splunk...
-   <%= @splunk_cmd %> restart 
+  "/opt/splunk/bin/splunk" restart 
   RETVAL=$?
 }
 splunk_status() {
   echo Splunk status:
-   <%= @splunk_cmd %> status 
+  "/opt/splunk/bin/splunk" status 
   RETVAL=$?
 }
 case "$1" in

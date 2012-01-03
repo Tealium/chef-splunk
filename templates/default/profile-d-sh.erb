@@ -1,9 +1,0 @@
-# User specific environment and startup programs
-<% if node.run_list.roles.include?("#{node[:splunk][:server_role]}")%>
-  <% splunk_dir = "/opt/splunk"%>
-<%else%>
-  <% splunk_dir = "/opt/splunkforwarder"%>
-<%end%>
-# export $SPLUNK_HOME=<%= splunk_dir %>/bin
-PATH=$PATH:<%= splunk_dir %>/bin
-export PATH
