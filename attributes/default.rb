@@ -15,7 +15,7 @@ set[:splunk][:browser_timeout]              = "0"
 set[:splunk][:minify_js]                    = "true"
 set[:splunk][:minify_css]                   = "true"
 
-set[:splunk][:use_ssl]                      = true
+set[:splunk][:use_ssl]                      = false
 set[:splunk][:ssl_crt]                      = "ssl.crt"
 set[:splunk][:ssl_key]                      = "ssl.key"
 
