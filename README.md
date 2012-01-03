@@ -1,13 +1,13 @@
 Description
 ===========
 
-This cookbook provides recipes for installing Splunk Server, Splunk Forwarders, and a few sample Splunk Apps (DeploymentMonitor, PDF Server, *nix) in Amazon EC2.  It also includes a provider for installing other Splunk Apps.
+This Chef cookbook provides recipes for installing Splunk Server, Splunk Forwarders, and a few sample Splunk Apps (DeploymentMonitor, PDF Server, *nix) in Amazon EC2.  It also includes a provider for installing other Splunk Apps.
 
 Changes
 =======
 
-v0.0.2 - Revamp
-v0.0.1 - Initial Release
+* v0.0.2 - Revamp
+* v0.0.1 - Initial Release
 
 Current Bugs
 ============
@@ -130,7 +130,7 @@ This will install the Splunk Forwarder and shows an example of an attribute over
 
 	recipe[splunk_cookbook::forwarder]
 
-This will tell the forwarder to look for a splunk_chef_server.inputs.conf.erb file located in templates/default/forwarder/FORWARDER_FOLDER
+This will tell the forwarder to look for a splunk_chef_server.inputs.conf.erb file located in templates/default/forwarder/FORWARDER_CONFIG_FOLDER
 
 	override_attributes(
 		"splunk_cookbook" => {
@@ -143,7 +143,7 @@ This will tell the forwarder to look for a splunk_chef_server.inputs.conf.erb fi
 
 	recipe[splunk_cookbook::server]
 	
-This will tell the splunk server to look in the dynamic config files located in templates/default/server/PROPS_FOLDER
+This will tell the splunk server to use the dynamic config files located in templates/default/server/SERVER_CONFIG_FOLDER
 	
 	override_attributes(
 		"splunk_cookbook" => {
