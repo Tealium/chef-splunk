@@ -128,12 +128,12 @@ Usage
 
 This will install the Splunk Forwarder and shows an example of an attribute override to move a specific splunk inputs.conf file for this server.
 
-	recipe[splunk-cookbook::forwarder]
+	recipe[splunk_cookbook::forwarder]
 
 This will tell the forwarder to look for a splunk_chef_server.inputs.conf.erb file located in templates/default/forwarder/FORWARDER_FOLDER
 
 	override_attributes(
-		"splunk-cookbook" => {
+		"splunk_cookbook" => {
     		"forwarder_config_folder" => "prod",
     		"forwarder_role" => "splunk_chef_server"
 		}
@@ -141,19 +141,19 @@ This will tell the forwarder to look for a splunk_chef_server.inputs.conf.erb fi
 
 ## Server Install:
 
-	recipe[splunk-cookbook::server]
+	recipe[splunk_cookbook::server]
 	
 This will tell the splunk server to look in the dynamic config files located in templates/default/server/PROPS_FOLDER
 	
 	override_attributes(
-		"splunk-cookbook" => {
+		"splunk_cookbook" => {
 			"server_config_folder" => "prod"
 		}
 	)
 
 ## Deployment Monitor App Install:
 
-	recipe[splunk-cookbook::deploy-mon-app]
+	recipe[splunk_cookbook::deploy-mon-app]
 
 Resources and Providers
 =======================
@@ -179,7 +179,7 @@ Attribute Parameters:
 
 This will install or upgrade the *nix app:
 
-	splunk_app_install "Installing #{node[:splunk][:unix_app_file]} -- Version: #{node[:splunk][:unix_app_version]}" do
+	splunk_cookbook_app_install "Installing #{node[:splunk][:unix_app_file]} -- Version: #{node[:splunk][:unix_app_version]}" do
 		action                  [:create_if_missing]
 		app_file                "#{node[:splunk][:unix_app_file]}"
 		app_version             "#{node[:splunk][:unix_app_version]}"
