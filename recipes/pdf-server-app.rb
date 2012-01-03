@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-splunk_app_install "Installing #{node[:splunk][:pdf_server_file]} -- Version: #{node[:splunk][:pdf_server_version]}" do
+splunk_cookbook_app_install "Installing #{node[:splunk][:pdf_server_file]} -- Version: #{node[:splunk][:pdf_server_version]}" do
   action                    [:create_if_missing]
   app_file                  "#{node[:splunk][:pdf_server_file]}"
   app_version               "#{node[:splunk][:pdf_server_version]}"

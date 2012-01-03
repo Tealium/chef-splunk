@@ -1,5 +1,5 @@
 # Name of the cookbook (referenced in forwarder.rb)
-set[:splunk][:cookbook_name]                = "splunk-cookbook"
+set[:splunk][:cookbook_name]                = "splunk_cookbook"
 
 #indexer configuration attributes
 set[:splunk][:indexer_name]                 = "splunk_indexers"
