@@ -20,6 +20,7 @@ default[:splunk][:ssl_crt]                      = "ssl.crt"
 default[:splunk][:ssl_key]                      = "ssl.key"
 
 # Dashboards to deploy
+default[:splunk][:deploy_dashboards]            = true
 default[:splunk][:dashboards_to_deploy]         = ["apache_http","useragents"]
 
 # Static Server Configs (Configs that match regardless of environment -Dev,QA,PL,Prod,Etc)

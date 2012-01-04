@@ -19,37 +19,39 @@
 #
 
   splunk_cmd = "#{node[:splunk][:server_home]}/bin/splunk"
+  splunk_package_version = "splunk-#{node[:splunk][:server_version]}-#{node[:splunk][:server_build]}"
 
-  splunk_file = case node[:platform]
+  splunk_file = splunk_package_version + 
+    case node[:platform]
     when "centos","redhat","fedora"
       if node[:kernel][:machine] == "x86_64"
-        splunk_file = "splunk-#{node[:splunk][:server_version]}-#{node[:splunk][:server_build]}-linux-2.6-x86_64.rpm"
+        "-linux-2.6-x86_64.rpm"
       else
-        splunk_file = "splunk-#{node[:splunk][:server_version]}-#{node[:splunk][:server_build]}.i386.rpm"
-    end
+        ".i386.rpm"
+      end
     when "debian","ubuntu"
       if node[:kernel][:machine] == "x86_64"
-        splunk_file = "splunk-#{node[:splunk][:server_version]}-#{node[:splunk][:server_build]}-linux-2.6-amd64.deb"
+        "-linux-2.6-amd64.deb"
       else
-        splunk_file = "splunk-#{node[:splunk][:server_version]}-#{node[:splunk][:server_build]}-linux-2.6-intel.deb"
+        "-linux-2.6-intel.deb"
+      end
     end
-  end
 
   remote_file "/opt/#{splunk_file}" do
     source "#{node[:splunk][:server_root]}/#{node[:splunk][:server_version]}/splunk/linux/#{splunk_file}"
     action :create_if_missing
   end
 
-  case node[:platform]
+  package splunk_package_version do
+    source "/opt/#{splunk_file}"
+    case node[:platform]
     when "centos","redhat","fedora"
-      rpm_package "/opt/#{splunk_file}" do
-        source "/opt/#{splunk_file}"
-      end
+      provider Chef::Provider::Package::Rpm
     when "debian","ubuntu"
-      dpkg_package "/opt/#{splunk_file}" do
-        source "/opt/#{splunk_file}"
-      end
+      provider Chef::Provider::Package::Dpkg
+    end
   end
+
 
   template "#{node[:splunk][:server_home]}/etc/splunk-launch.conf" do
       source "server/splunk-launch.conf.erb"
@@ -148,9 +150,11 @@
     recursive true
   end
 
-  node[:splunk][:dashboards_to_deploy].each do |dashboard|
-    cookbook_file "#{node[:splunk][:server_home]}/etc/users/admin/search/local/data/ui/views/#{dashboard}.xml" do
-      source "dashboards/#{dashboard}.xml"
+  if node[:splunk][:deploy_dashboards] == true
+    node[:splunk][:dashboards_to_deploy].each do |dashboard|
+      cookbook_file "#{node[:splunk][:server_home]}/etc/users/admin/search/local/data/ui/views/#{dashboard}.xml" do
+        source "dashboards/#{dashboard}.xml"
+      end
     end
   end
 

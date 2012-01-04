@@ -44,6 +44,7 @@ See `attributes/default.rb` for default values.
 * `node['splunk']['ssl_crt']` - The cert file.  (files/default/ssl)
 * `node['splunk']['ssl_key']` - The private key File.  (files/default/ssl)
 
+* `node['splunk']['deploy_dashboards']` - Toggles deploying dashboards or not
 * `node['splunk']['dashboards_to_deploy']` - An array of xml dashboards to copy over. These are the filenames minus the .xml suffix (files/default/dashboards)
 
 * `node['splunk']['static_server_configs']` - An array of static server configs that *are not* specific to an environment (Dev, QA, PL, Prod, etc).  These are the primary names without the .conf.erb suffix. (templates/server)
