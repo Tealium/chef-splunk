@@ -25,19 +25,21 @@ directory "/opt" do
 end
 
 splunk_cmd = "#{node[:splunk][:forwarder_home]}/bin/splunk"
+splunk_package_version = "splunkforwarder-#{node[:splunk][:forwarder_version]}-#{node[:splunk][:forwarder_build]}"
 
-splunk_file = case node[:platform]
+splunk_file = splunk_package_version + 
+  case node[:platform]
   when "centos","redhat","fedora"
     if node[:kernel][:machine] == "x86_64"
-      splunk_file = "splunkforwarder-#{node[:splunk][:forwarder_version]}-#{node[:splunk][:forwarder_build]}-linux-2.6-x86_64.rpm"
+      "-linux-2.6-x86_64.rpm"
     else
-      splunk_file = "splunkforwarder-#{node[:splunk][:forwarder_version]}-#{node[:splunk][:forwarder_build]}.i386.rpm"
+      ".i386.rpm"
     end
   when "debian","ubuntu"
     if node[:kernel][:machine] == "x86_64"
-      splunk_file = "splunkforwarder-#{node[:splunk][:forwarder_version]}-#{node[:splunk][:forwarder_build]}-linux-2.6-amd64.deb"
+      "-linux-2.6-amd64.deb"
     else
-      splunk_file = "splunkforwarder-#{node[:splunk][:forwarder_version]}-#{node[:splunk][:forwarder_build]}-linux-2.6-intel.deb"
+      "-linux-2.6-intel.deb"
     end
   end
 
@@ -46,16 +48,15 @@ remote_file "/opt/#{splunk_file}" do
   action :create_if_missing
 end
 
-case node[:platform]
+package splunk_package_version do
+  source "/opt/#{splunk_file}"
+  case node[:platform]
   when "centos","redhat","fedora"
-    rpm_package "/opt/#{splunk_file}" do
-      source "/opt/#{splunk_file}"
-    end
+    provider Chef::Provider::Package::Rpm
   when "debian","ubuntu"
-    dpkg_package "/opt/#{splunk_file}" do
-      source "/opt/#{splunk_file}"
-    end
+    provider Chef::Provider::Package::Dpkg
   end
+end
 
 execute "#{splunk_cmd} start --accept-license --answer-yes" do
   not_if do
