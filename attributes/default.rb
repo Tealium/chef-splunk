@@ -31,7 +31,7 @@ default[:splunk][:dynamic_server_configs]       = ["inputs","props"]
 
 #configuration values for forwarders
 default[:splunk][:receiver_port]                = "9997"
-default[:splunk][:limits_thruput]               = "256"default
+default[:splunk][:limits_thruput]               = "256"
 
 #Change the default admin password (Username::Password)
 default[:splunk][:auth]                         = "admin:SomePassword123!!"
