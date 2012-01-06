@@ -36,10 +36,10 @@ default[:splunk][:limits_thruput]               = "256"
 #Change the default admin password (Username::Password)
 default[:splunk][:auth]                         = "admin:SomePassword123!!"
 
-#default the role of your splunk indexer
+#Set the role of your splunk indexer
 default[:splunk][:server_role]                  = "splunk-server"
 
-#default the default role for splunk forwarders
+#Set the default role for splunk forwarders
 default[:splunk][:forwarder_role]               = "default"
 default[:splunk][:forwarder_config_folder]      = "prodlike"
 default[:splunk][:server_config_folder]         = "prodlike"
