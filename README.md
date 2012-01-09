@@ -134,7 +134,7 @@ This will install the Splunk Forwarder and shows an example of an attribute over
 This will tell the forwarder to look for a splunk_chef_server.inputs.conf.erb file located in templates/default/forwarder/FORWARDER_CONFIG_FOLDER
 
 	override_attributes(
-		"splunk_cookbook" => {
+		"splunk" => {
     		"forwarder_config_folder" => "prod",
     		"forwarder_role" => "splunk_chef_server"
 		}
@@ -147,7 +147,7 @@ This will tell the forwarder to look for a splunk_chef_server.inputs.conf.erb fi
 This will tell the splunk server to use the dynamic config files located in templates/default/server/SERVER_CONFIG_FOLDER
 	
 	override_attributes(
-		"splunk_cookbook" => {
+		"splunk" => {
 			"server_config_folder" => "prod"
 		}
 	)
