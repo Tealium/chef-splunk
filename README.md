@@ -6,6 +6,7 @@ This Chef cookbook provides recipes for installing Splunk Server, Splunk Forward
 Changes
 =======
 
+* v0.0.3 - Changing version of Splunk to 4.3
 * v0.0.2 - Revamp
 * v0.0.1 - Initial Release
 

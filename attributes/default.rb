@@ -47,12 +47,12 @@ default[:splunk][:server_config_folder]         = "prodlike"
 ##Set the Splunk Version to be used
 #Server
 default[:splunk][:server_root]                  = "http://download.splunk.com/releases"
-default[:splunk][:server_version]               = "4.2.5"
-default[:splunk][:server_build]                 = "113966"
+default[:splunk][:server_version]               = "4.3"
+default[:splunk][:server_build]                 = "115073"
 #Forwarder
 default[:splunk][:forwarder_root]               = "http://download.splunk.com/releases"
-default[:splunk][:forwarder_version]            = "4.2.5"
-default[:splunk][:forwarder_build]              = "113966"
+default[:splunk][:forwarder_version]            = "4.3"
+default[:splunk][:forwarder_build]              = "115073"
 
 # Unix app version number 
 default[:splunk][:unix_app_file]                = "unix.tar.gz"
