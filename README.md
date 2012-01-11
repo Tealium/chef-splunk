@@ -22,6 +22,7 @@ Requirements
 
 * Ubuntu, Debian, RedHat, CentOS, Fedora
 
+- This cookbook should be renamed to "splunk" inside of your cookbooks folder
 - This cookbook has only been tested thoroughly with Ubuntu
 
 Attributes
