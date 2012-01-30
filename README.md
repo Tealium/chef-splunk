@@ -6,6 +6,7 @@ This Chef cookbook provides recipes for installing Splunk Server, Splunk Forward
 Changes
 =======
 
+* v0.0.4 - Added a splunk app: Pulse for AWS Cloudwatch.  This app will pull back metrics from AWS Cloudwatch and provides sample dashboards to display the information.  Read the SETUP.txt located in the root directory of the app file for installation requirements.
 * v0.0.3 - Changing version of Splunk to 4.3
 * v0.0.2 - Revamp
 * v0.0.1 - Initial Release
@@ -22,7 +23,9 @@ Requirements
 
 * Ubuntu, Debian, RedHat, CentOS, Fedora
 
-- This cookbook should be renamed to "splunk" inside of your cookbooks folder
+- If you rename the cookbook from the original name of "splunk_cookbook" to a name "splunk", be sure to modify the following:
+* attributes/default.rb: `node['splunk']['cookbook_name']`
+* recipes/*-app.rb: splunk_cookbook_app_install -> {NEW_NAME}_app_install (e.g., splunk_app_install)
 - This cookbook has only been tested thoroughly with Ubuntu
 
 Attributes
@@ -86,6 +89,13 @@ See `attributes/default.rb` for default values.
 * `node['splunk']['sideview_utils_file]` - The name of the sideview utils app file.  (files/default/apps)
 * `node['splunk']['sideview_utils_version']` - The version number associated with this file.
 
+* `node['splunk']['pulse_app_file']` - The name of the Pulse for AWS Cloudwatch app file.  (files/default/apps)
+* `node['splunk']['pulse_app_version']` - The version number associated with this file.
+* `node['splunk']['boto_remote_location]` - The base URL for downloading the Python boto library
+* `node['splunk']['boto_verison]` - The version of boto to download
+* `node['splunk']['dateutil_remote_location]` - The base URL for downloading the Python dateutil library
+* `node['splunk']['dateutil_version]` - The version of python-dateutil to download
+
 Recipes
 =======
 
@@ -123,6 +133,11 @@ splunk-sos-app
 Installs the Splunk on Splunk App and the required dependency app of Sideview Utils.  
 - Download Splunk on Splunk from http://splunk-base.splunk.com/apps/29008/sos-splunk-on-splunk and place it under files/default/apps/sos.tar.gz
 - Download Sideview Utils from http://splunk-base.splunk.com/apps/36405/sideview-utils and place it under files/default/apps/sideview_utils.tar.gz
+
+pulse-app
+---------
+
+Installs the Pulse for AWS Cloudwatch App and the required Python libraries.
 
 Usage
 =====

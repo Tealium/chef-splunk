@@ -73,3 +73,11 @@ default[:splunk][:splunk_sos_version]           = "2.0.0"
 # Splunk SOS Required App
 default[:splunk][:sideview_file]                = "sideview_utils.tar.gz"
 default[:splunk][:sideview_version]             = "1.2.5"
+
+# Pulse for AWS Cloudwatch App
+default[:splunk][:pulse_app_file]               = "pulse_for_aws_cloudwatch.tar.gz"
+default[:splunk][:pulse_app_version]            = "1.0"
+default[:splunk][:boto_remote_location]         = "http://boto.googlecode.com/files"
+default[:splunk][:boto_version]                 = "2.1.1"
+default[:splunk][:dateutil_remote_location]     = "http://labix.org/download/python-dateutil"
+default[:splunk][:dateutil_version]             = "1.5"
