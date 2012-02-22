@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+def initialize(*args)
+  super
+  @action = :create_if_missing
+end
 
 action :create_if_missing do
     app_version = @new_resource.app_version
@@ -21,10 +25,10 @@ action :create_if_missing do
     local_templates_directory = @new_resource.local_templates_directory
     remove_dir = @new_resource.remove_dir_on_upgrade
     
-    if node.run_list.roles.include?("#{node[:splunk][:server_role]}")
-      splunk_dir = "#{node[:splunk][:server_home]}"
+    if node.run_list.roles.include?(node['splunk']['server_role'])
+      splunk_dir = node['splunk']['server_home']
     else
-      splunk_dir = "#{node[:splunk][:forwarder_home]}"
+      splunk_dir = node['splunk']['forwarder_home']
     end
     
     directory_name = app_file.split(".")[0]
@@ -35,6 +39,7 @@ action :create_if_missing do
     install_or_upgrade(app_file, app_version, directory_name, version_file, splunk_dir, remove_dir)
     
     move_local_templates(local_templates, local_templates_directory, directory_name, splunk_dir)
+    new_resource.updated_by_last_action(true)
 end
 
 private
@@ -51,7 +56,7 @@ end
 
 def install_or_upgrade(app_file, app_version, directory_name, version_file, splunk_dir, remove_dir)
    
-    if ::File.exists?("#{version_file}") == false
+    if ::File.exists?(version_file) == false
 
       if ::File.directory?("#{splunk_dir}/etc/apps/#{directory_name}") == true
 
@@ -77,8 +82,8 @@ def install_or_upgrade(app_file, app_version, directory_name, version_file, splu
         group "root"
       end
 
-      file "#{version_file}" do
-        content "#{app_version}"
+      file version_file do
+        content app_version
       end
     end
     
