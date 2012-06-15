@@ -47,12 +47,12 @@ default['splunk']['server_config_folder']         = "prodlike"
 ##Set the Splunk Version to be used
 #Server
 default['splunk']['server_root']                  = "http://download.splunk.com/releases"
-default['splunk']['server_version']               = "4.3.1"
-default['splunk']['server_build']                 = "119532"
+default['splunk']['server_version']               = "4.3.2"
+default['splunk']['server_build']                 = "123586"
 #Forwarder
 default['splunk']['forwarder_root']               = "http://download.splunk.com/releases"
-default['splunk']['forwarder_version']            = "4.3.1"
-default['splunk']['forwarder_build']              = "119532"
+default['splunk']['forwarder_version']            = "4.3.2"
+default['splunk']['forwarder_build']              = "123586"
 
 # Unix app version number 
 default['splunk']['unix_app_file']                = "unix.tar.gz"
@@ -68,11 +68,11 @@ default['splunk']['deployment_mon_version']       = "4.2.2"
 
 # Splunk SOS app
 default['splunk']['splunk_sos_file']              = "sos.tar.gz"
-default['splunk']['splunk_sos_version']           = "2.0.0"
+default['splunk']['splunk_sos_version']           = "2.1.0"
 
 # Splunk SOS Required App
 default['splunk']['sideview_file']                = "sideview_utils.tar.gz"
-default['splunk']['sideview_version']             = "1.2.5"
+default['splunk']['sideview_version']             = "1.3.4"
 
 # Pulse for AWS Cloudwatch App
 default['splunk']['pulse_app_file']               = "pulse_for_aws_cloudwatch.tar.gz"
