@@ -36,7 +36,7 @@ Requirements
 - The cookbook is currently setup to run being named "splunk".  If you rename the cookbook from the original name of "splunk", be sure to modify the following:
 	* attributes/default.rb: `node['splunk']['cookbook_name']`
 	* recipes/*-app.rb: splunk_app_install -> {NEW_NAME}_app_install (e.g., splunk_app_install)
-- This cookbook has only been tested thoroughly with Ubuntu
+- This cookbook has only been tested thoroughly with RHEL
 
 Attributes
 ==========
