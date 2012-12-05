@@ -17,6 +17,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+  service "splunk" do
+    action [ :nothing ]
+    supports  :status => true, :start => true, :stop => true, :restart => true
+  end
 
   splunk_cmd = "#{node['splunk']['server_home']}/bin/splunk"
   splunk_package_version = "splunk-#{node['splunk']['server_version']}-#{node['splunk']['server_build']}"
@@ -37,13 +41,13 @@
       end
     end
 
-  remote_file "/opt/#{splunk_file}" do
+  remote_file "#{Chef::Config['file_cache_path']}/#{splunk_file}" do
     source "#{node['splunk']['server_root']}/#{node['splunk']['server_version']}/splunk/linux/#{splunk_file}"
     action :create_if_missing
   end
 
   package splunk_package_version do
-    source "/opt/#{splunk_file}"
+    source "#{Chef::Config['file_cache_path']}/#{splunk_file}"
     case node['platform']
     when "centos","redhat","fedora"
       provider Chef::Provider::Package::Rpm
@@ -86,15 +90,10 @@
 
   end
   
-  execute "#{splunk_cmd} start --accept-license --answer-yes" do
+  execute "#{splunk_cmd} enable boot-start --accept-license --answer-yes" do
     not_if do
-      `#{splunk_cmd} status | grep 'splunkd'`.chomp! =~ /^splunkd is running/
-    end
-  end
-
-  execute "#{splunk_cmd} enable boot-start" do
-    not_if do
-      File.symlink?('/etc/rc3.d/S20splunk')
+      File.symlink?('/etc/rc3.d/S20splunk') ||
+      File.symlink?('/etc/rc3.d/S90splunk')
     end
   end
 
@@ -106,12 +105,7 @@
   end
 
   execute "#{splunk_cmd} enable listen #{node['splunk']['receiver_port']} -auth #{node['splunk']['auth']}" do
-    not_if "netstat -a | grep #{node['splunk']['receiver_port']}"
-  end
-
-  service "splunk" do
-    action [ :nothing ]
-    supports  :status => true, :start => true, :stop => true, :restart => true
+    not_if "netstat -an | grep #{node['splunk']['receiver_port']}"
   end
 
   node['splunk']['static_server_configs'].each do |cfg|
@@ -157,4 +151,3 @@
       end
     end
   end
-

@@ -2,8 +2,10 @@
 httpport = <%= node['splunk']['web_server_port'] %>
 enableSplunkWebSSL = <%= node['splunk']['use_ssl'] %>  
 
+<% if node['splunk']['use_ssl'] -%>
 privKeyPath = <%= node['splunk']['server_home']%>/ssl/<%= node['splunk']['ssl_key']%>
 caCertPath = <%= node['splunk']['server_home']%>/ssl/<%= node['splunk']['ssl_crt']%>
+<% end -%>
 
 ui_inactivity_timeout = <%= node['splunk']['browser_timeout'] %>
 minify_js = <%= node['splunk']['minify_js'] %>
