@@ -6,7 +6,16 @@ This Chef cookbook provides recipes for installing Splunk Server, Splunk Forward
 Changes
 =======
 
-* v0.0.7 - To be filled in once all changes are complete.
+* v0.0.7 -
+	- Broke up the attributes into separate files.  This will be needed as we add a lot of features to this cookbook
+	- Redesigned how splunk starts -- fixed accept-license / answer-yes problems when starting splunk for the first time with version 5.
+	- Added SSL Forwarding as an option.  See attributes/README.md under the forwarder.rb section.
+		- With splunk having a unique secret per install, you may see a couple of splunk restarts while saves the encrypted passwords.  When you deploy a regular password (e.g., splunk), splunk will encrypt that regular password on service start and replace it in the config file.  On the next run, chef will read that encrypted password and save it for future runs, but may restart splunk because checksums will not match.
+		- If you ever completely remove splunk and then install splunk, you will have to destroy two attributes on the nodes because the splunk.secret will be different.  We can solve this in the future releases.  The attributes are:
+			node['splunk']['inputsSSLPass']
+			node['splunk']['outputsSSLPass']
+	- Removed default['splunk']['indexer_name'] in attributes/default.rb. 
+	- Got rid of the annoying output on the multiple "moving inputs file" for the forwarders.  It should now only do it once.
 * v0.0.4 - Added a splunk app: Pulse for AWS Cloudwatch.  This app will pull back metrics from AWS Cloudwatch and provides sample dashboards to display the information.  Read the SETUP.txt located in the root directory of the app file for installation requirements.
 * v0.0.3 - Changing version of Splunk to 4.3
 * v0.0.2 - Revamp

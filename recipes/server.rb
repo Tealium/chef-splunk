@@ -64,7 +64,7 @@
       group "root"
   end
 
-  if node['splunk']['use_ssl']
+  if node['splunk']['use_ssl'] == true
     
     directory "#{node['splunk']['server_home']}/ssl" do
       owner "root"
@@ -88,6 +88,41 @@
       group "root"
     end
 
+  end
+
+  if node['splunk']['ssl_forwarding'] == true
+
+    # Create the SSL Cert Directory for the Forwarders
+    directory "#{node['splunk']['server_home']}/etc/auth/forwarders" do
+      owner "root"
+      group "root"
+      action :create
+      recursive true
+    end
+
+    # Copy over the SSL Certs
+    [node['splunk']['ssl_forwarding_cacert'],node['splunk']['ssl_forwarding_servercert']].each do |cert|
+      cookbook_file "#{node['splunk']['server_home']}/etc/auth/forwarders/#{cert}" do
+        source "ssl/forwarders/#{cert}"
+        owner "root"
+        group "root"
+        mode "0755"
+        notifies :restart, resources(:service => "splunk")
+      end
+    end
+
+    # SSL passwords are encrypted when splunk reads the file.  We need to save the password.
+    # We need to save the password if it has changed so we don't keep restarting splunk.
+    # Splunk encrypted passwords always start with $1$
+    ruby_block "Saving Encrypted Password (inputs.conf)" do
+      block do
+        inputsPass = `grep -m 1 "password = " #{node['splunk']['server_home']}/etc/system/local/inputs.conf | sed 's/password = //'`
+        if inputsPass.match(/^\$1\$/) && inputsPass != node['splunk']['inputsSSLPass']
+          node['splunk']['inputsSSLPass'] = inputsPass
+          node.save
+        end
+      end
+    end
   end
   
   execute "#{splunk_cmd} enable boot-start --accept-license --answer-yes" do
