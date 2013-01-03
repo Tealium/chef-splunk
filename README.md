@@ -6,6 +6,8 @@ This Chef cookbook provides recipes for installing Splunk Server, Splunk Forward
 Changes
 =======
 
+* v0.0.9 -
+    - Added Distributed Searching.  This requires an Enterprise License with the CanBeRemoteMaster / DistSearch Feature Flags.  See the Distributed Search section for more details.
 * v0.0.8 -
 	- Added scripted authentication logic.  We use an external SSO system for logins.  Splunk's scripted authentication allows us to write custom scripts to interact with that SSO system to facilitate authentication.  See http://docs.splunk.com/Documentation/Splunk/5.0.1/Security/ConfigureSplunkToUsePAMOrRADIUSAuthentication for more information.
 * v0.0.7 -
@@ -154,6 +156,27 @@ This will install or upgrade the *nix app:
 		local_templates         ["app.conf.erb","inputs.conf.erb"]
 		remove_dir_on_upgrade   "true"
 	end
+
+Distributed Search
+==================
+
+** Requires a License with CanBeRemoteMaster / DistSearch Feature Flags.  Trial licenses do not appear CanBeRemoteMaster.
+
+Distributed Search (1-n Search Heads <-> 1-n Search Indexers) setup is not complex, but does require a few chef runs.  We run chef-client as a service every XX minutes to keep the search nodes and indexers up to date.  When we add new indexers, within XX minutes the search peers will be updated on all the search heads.
+
+This implementation will be a 1-n Search Head/Indexer setup.  Future versions will include an implementation to allow n-n with shared bundles.
+
+## Setup:
+
+1. Override node['splunk']['distributed_search'] to true
+2. Override node['splunk']['distributed_search_master'] to the local IP of the master license server.
+3. Set the search head role to the value of node['splunk']['server_role']
+4. Set the search indexer role to the value of node['splunk']['indexer_role']
+5. Run Chef on the Search Head -- This will save the instance's ServerName and trusted.pem contents as an attributeto the chef server.
+6. Run Chef on the Search Indexer -- This will deploy the search heads trusted.pem to the local indexer (node['splunk']['server_home']/etc/auth/distServerKeys/ServerName) and create a distsearch.conf.
+7. Run Chef on the Search Head -- This will modify the distsearch.conf to point to the indexer.
+
+A lot of steps?  Perhaps, but if it's running as a service you can technically do steps 1-4 and let the service runs do 5-7.  It just may take a little longer depending on how often chef runs.
 
 License and Author
 ==================

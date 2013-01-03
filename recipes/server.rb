@@ -17,10 +17,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-service "splunk" do
-  action [ :nothing ]
-  supports  :status => true, :start => true, :stop => true, :restart => true
-end
+
+# True for both a Dedicated Search head for Distributed Search and for non-distributed search
+dedicated_search_head = true 
+# Only true if we are a dedicated indexer AND are doing a distributed search setup
+dedicated_indexer = false
+# True only if our public ip matches what we set the master to be
+search_master = (node['splunk']['dedicated_search_master'] == node['ipaddress']) ? true : false
 
 splunk_cmd = "#{node['splunk']['server_home']}/bin/splunk"
 splunk_package_version = "splunk-#{node['splunk']['server_version']}-#{node['splunk']['server_build']}"
@@ -56,6 +59,27 @@ package splunk_package_version do
   end
 end
 
+if node['splunk']['distributed_search'] == true
+  # Add the Distributed Search Template
+  node['splunk']['static_server_configs'] << "distsearch"
+   
+  # We are a search head
+  if node.run_list.include?("role[#{node['splunk']['server_role']}]")
+    search_indexers = search(:node, "role:#{node['splunk']['indexer_role']}")
+    # Add an outputs.conf.  Search Heads should not be doing any indexing
+    node['splunk']['static_server_configs'] << "outputs"
+  else
+    dedicated_search_head = false
+  end
+
+  # we are a dedicated indexer
+  if node.run_list.include?("role[#{node['splunk']['indexer_role']}]")
+    # Find all search heads so we can move their trusted.pem files over
+    search_heads = search(:node, "role:#{node['splunk']['server_role']}")
+    dedicated_indexer = true
+  end
+end
+
 
 template "#{node['splunk']['server_home']}/etc/splunk-launch.conf" do
     source "server/splunk-launch.conf.erb"
@@ -64,7 +88,7 @@ template "#{node['splunk']['server_home']}/etc/splunk-launch.conf" do
     group "root"
 end
 
-if node['splunk']['use_ssl'] == true
+if node['splunk']['use_ssl'] == true && dedicated_search_head == true
   
   directory "#{node['splunk']['server_home']}/ssl" do
     owner "root"
@@ -114,13 +138,22 @@ if node['splunk']['ssl_forwarding'] == true
   # SSL passwords are encrypted when splunk reads the file.  We need to save the password.
   # We need to save the password if it has changed so we don't keep restarting splunk.
   # Splunk encrypted passwords always start with $1$
-  ruby_block "Saving Encrypted Password (inputs.conf)" do
+  ruby_block "Saving Encrypted Password (inputs.conf/outputs.conf)" do
     block do
       inputsPass = `grep -m 1 "password = " #{node['splunk']['server_home']}/etc/system/local/inputs.conf | sed 's/password = //'`
       if inputsPass.match(/^\$1\$/) && inputsPass != node['splunk']['inputsSSLPass']
         node['splunk']['inputsSSLPass'] = inputsPass
         node.save
       end
+
+      if node['splunk']['distributed_search'] == true && dedicated_search_head == true 
+          outputsPass = `grep -m 1 "sslPassword = " #{node['splunk']['server_home']}/etc/system/local/outputs.conf | sed 's/sslPassword = //'`
+        
+          if outputsPass.match(/^\$1\$/) && outputsPass != node['splunk']['outputsSSLPass']
+            node['splunk']['outputsSSLPass'] = outputsPass
+            node.save
+          end
+        end
     end
   end
 end
@@ -133,17 +166,27 @@ execute "#{splunk_cmd} enable boot-start --accept-license --answer-yes" do
 end
 
 splunk_password = node['splunk']['auth'].split(':')[1]
-execute "#{splunk_cmd} edit user admin -password #{splunk_password} -roles admin -auth admin:changeme && echo true > /opt/splunk_setup_passwd" do
+execute "Changing Admin Password" do 
+  command "#{splunk_cmd} edit user admin -password #{splunk_password} -roles admin -auth admin:changeme && echo true > /opt/splunk_setup_passwd"
   not_if do
     File.exists?("/opt/splunk_setup_passwd")
   end
 end
 
-execute "#{splunk_cmd} enable listen #{node['splunk']['receiver_port']} -auth #{node['splunk']['auth']}" do
-  not_if "netstat -an | grep #{node['splunk']['receiver_port']}"
+service "splunk" do
+  action [ :start ]
+  supports  :status => true, :start => true, :stop => true, :restart => true
 end
 
-if node['splunk']['scripted_auth'] == true
+# Enable receiving ports only if we are a standalone installation or a dedicated_indexer
+if dedicated_indexer == true || node['splunk']['distributed_search'] == false
+  execute "Enabling Receiver Port #{node['splunk']['receiver_port']}" do 
+    command "#{splunk_cmd} enable listen #{node['splunk']['receiver_port']} -auth #{node['splunk']['auth']}"
+    not_if "grep splunktcp:#{node['splunk']['receiver_port']} #{node['splunk']['server_home']}/etc/system/local/inputs.conf"
+  end
+end
+
+if node['splunk']['scripted_auth'] == true && dedicated_search_head == true
   # Be sure to deploy the authentication template.
   node['splunk']['static_server_configs'] << "authentication"
 
@@ -152,7 +195,7 @@ if node['splunk']['scripted_auth'] == true
   else
     scripted_auth_creds = { "user" => "", "password" => ""}
   end
-  
+
   directory "#{node['splunk']['server_home']}/#{node['splunk']['scripted_auth_directory']}" do
     recursive true
     action :create
@@ -183,13 +226,19 @@ if node['splunk']['scripted_auth'] == true
 end
 
 node['splunk']['static_server_configs'].each do |cfg|
-    template "#{node['splunk']['server_home']}/etc/system/local/#{cfg}.conf" do
-     	source "server/#{cfg}.conf.erb"
-     	owner "root"
-     	group "root"
-     	mode "0640"
-      notifies :restart, resources(:service => "splunk")
-     end
+  template "#{node['splunk']['server_home']}/etc/system/local/#{cfg}.conf" do
+   	source "server/#{cfg}.conf.erb"
+   	owner "root"
+   	group "root"
+   	mode "0640"
+    variables(
+        :search_heads => search_heads,
+        :search_indexers => search_indexers,
+        :dedicated_search_head => dedicated_search_head,
+        :dedicated_indexer => dedicated_indexer
+      )
+    notifies :restart, resources(:service => "splunk")
+  end
 end
 
 node['splunk']['dynamic_server_configs'].each do |cfg|
@@ -226,6 +275,56 @@ if node['splunk']['deploy_dashboards'] == true
   end
 end
 
-service "splunk" do
-   action :start
-end
+if node['splunk']['distributed_search'] == true
+  # We are not the search master.. we need to link up to the master for our license information
+  if search_master == false
+    execute "Linking license to search master" do
+      command "#{splunk_cmd} edit licenser-localslave -master_uri 'https://#{node['splunk']['dedicated_search_master']}:8089' -auth #{node['splunk']['auth']}"
+      not_if "grep \"master_uri = https://#{node['splunk']['dedicated_search_master']}:8089\" #{node['splunk']['server_home']}/etc/system/local/server.conf"
+    end
+  end
+
+  if dedicated_search_head == true
+    # We save this information so we can reference it on indexers.
+    ruby_block "Splunk Server - Saving Info" do
+      block do
+        splunk_server_name = `grep -m 1 "serverName = " #{node['splunk']['server_home']}/etc/system/local/server.conf | sed 's/serverName = //'`
+        splunk_server_name = splunk_server_name.strip
+      
+        if File.exists?("#{node['splunk']['server_home']}/etc/auth/distServerKeys/trusted.pem")
+          trustedPem = IO.read("#{node['splunk']['server_home']}/etc/auth/distServerKeys/trusted.pem")
+          if node['splunk']['trustedPem'] == nil || node['splunk']['trustedPem'] != trustedPem
+            node['splunk']['trustedPem'] = trustedPem
+            node.save
+          end
+        end
+
+        if node['splunk']['splunkServerName'] == nil || node['splunk']['splunkServerName'] != splunk_server_name
+          node['splunk']['splunkServerName'] = splunk_server_name
+          node.save
+        end
+      end
+    end
+  end
+
+  if dedicated_indexer == true
+    search_heads.each do |server| 
+      if server['splunk'] != nil && server['splunk']['trustedPem'] != nil && server['splunk']['splunkServerName'] != nil
+        directory "#{node['splunk']['server_home']}/etc/auth/distServerKeys/#{server['splunk']['splunkServerName']}" do
+          owner "root"
+          group "root"
+          action :create
+        end
+
+        file "#{node['splunk']['server_home']}/etc/auth/distServerKeys/#{server['splunk']['splunkServerName']}/trusted.pem" do
+          owner "root"
+          group "root"
+          mode "0600"
+          content server['splunk']['trustedPem'].strip
+          action :create
+          notifies :restart, resources(:service => "splunk")
+        end
+      end
+    end
+  end
+end # End of distributed search

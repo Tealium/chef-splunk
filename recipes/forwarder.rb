@@ -79,7 +79,14 @@ end
 if Chef::Config[:solo]
   Chef::Log.warn("This recipe uses search. Chef Solo does not support Search")
 else
-  splunk_servers = search(:node, "role:#{node['splunk']['server_role']}")
+  role_name = ""
+  if node['splunk']['distributed_search'] == true
+    role_name = node['splunk']['indexer_role']
+  else
+    role_name = node['splunk']['server_role']
+  end
+
+  splunk_servers = search(:node, "role:#{role_name}")
 end
 
 if node['splunk']['ssl_forwarding'] == true

@@ -26,4 +26,4 @@ default['splunk']['scripted_auth_getUsersTTL']	  = "1h"
 # password: pass
 default['splunk']['scripted_auth_data_bag_group'] = "apps"
 default['splunk']['scripted_auth_data_bag_name']  = "splunk_auth"
-default['splunk']['data_bag_key']				  = ""
+default['splunk']['data_bag_key']                 = ""

@@ -41,6 +41,7 @@ default
 
 * `node['splunk']['web_server_port']` - The port number to assign the web server (httpport).
 	- File location: templates/server/web.conf.erb
+* `node['splunk']['root_endpoint']` - The endpoint for the splunk web instance
 * `node['splunk']['browser_timeout']` - The inactivity timeout (ui_inactivity_timeout).
 	- File location: templates/server/web.conf.erb
 * `node['splunk']['minify_js']` - Indicates whether the static JS files for modules are consolidated and minified.
@@ -70,7 +71,16 @@ default
 
 * `node['splunk']['auth']` - The default admin password to use instead of splunks "changeme"
 
-* `node['splunk']['server_role']` - The name of the splunk indexer.  Forwarders will search for this role in order to identify the server in which to send the data.
+* `node['splunk']['server_role']` - The role name of the splunk standalone install / dedicated search head.  Forwarders will search for this role in order to identify the server in which to send the data.
+* `node['splunk']['indexer_role']` - The role name of the splunk indexer if using dedicated searching
+
+* `node['splunk']['max_searches_per_cpu']` - The max searches per cpu (limits.conf)
+
+
+distributed_search
+------------------
+* `node['splunk']['distributed_search']` - Enable/Disable distributed search
+* `node['splunk']['distributed_search_master']` - The local IP of the License Master
 
 forwarder
 ---------
