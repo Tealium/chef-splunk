@@ -89,6 +89,28 @@ forwarder
 	- File location: files/default/ssl/forwarders
 * `node['splunk']['ssl_forwarding_pass']` - Password for the certs
 
+scripted_auth
+-------------
+
+* `node['splunk']['scripted_auth']` - Enable Scripted Authentcation
+* `node['splunk']['scripted_auth_directory']` - The directory to place the authentication scripts.  This is appended to the base install directory
+
+* `node['splunk']['scripted_auth_files'] ` - An array of static cookbook files to deploy.
+	- File Location: files/default/scripted_auth
+	- Deployed to: `node['splunk']['scripted_auth_directory']`
+* `node['splunk']['scripted_auth_templates']` - An array of templates to deploy.
+	- File Location: templates/default/server/scripted_auth
+	- Deployed to: `node['splunk']['scripted_auth_directory']`
+* `node['splunk']['scripted_auth_script']` - The main script that will be called for authentication
+
+* `node['splunk']['scripted_auth_userLoginTTL']` - TTL to cache user login information
+* `node['splunk']['scripted_auth_getUserInfoTTL']` - TTL to cache user information
+* `node['splunk']['scripted_auth_getUsersTTL']` - TTL to cache all user information
+
+* `node['splunk']['scripted_auth_data_bag_group']` - The data bag group (if using data bags to deploy user/passwords in your auth file)
+* `node['splunk']['scripted_auth_data_bag_name']` - The data bag name (if using data bags to deploy user/passwords in your auth file)
+* `node['splunk']['data_bag_key']` - The data bag secret key.
+
 versions
 --------
 * `node['splunk']['server_root']` - The base URL that splunk uses to download release files for Splunk Server

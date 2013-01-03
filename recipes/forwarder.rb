@@ -154,3 +154,7 @@ template "/etc/init.d/splunk" do
   owner "root"
   group "root"
 end
+
+service "splunk" do
+   action :start
+end

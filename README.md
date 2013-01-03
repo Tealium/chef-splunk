@@ -6,6 +6,8 @@ This Chef cookbook provides recipes for installing Splunk Server, Splunk Forward
 Changes
 =======
 
+* v0.0.8 -
+	- Added scripted authentication logic.  We use an external SSO system for logins.  Splunk's scripted authentication allows us to write custom scripts to interact with that SSO system to facilitate authentication.  See http://docs.splunk.com/Documentation/Splunk/5.0.1/Security/ConfigureSplunkToUsePAMOrRADIUSAuthentication for more information.
 * v0.0.7 -
 	- Broke up the attributes into separate files.  This will be needed as we add a lot of features to this cookbook
 	- Redesigned how splunk starts -- fixed accept-license / answer-yes problems when starting splunk for the first time with version 5.
@@ -156,8 +158,8 @@ This will install or upgrade the *nix app:
 License and Author
 ==================
 
-Author:: Bryan Brandau (<bryan.brandau@bestbuy.com>)
 Author:: Andrew Painter (<andrew.painter@bestbuy.com>)
+Author:: Bryan Brandau (<bryan.brandau@bestbuy.com>)
 Author:: Aaron Peterson (<aaron@opscode.com>)
 
 Copyright 2011-2012, BBY Solutions, Inc.

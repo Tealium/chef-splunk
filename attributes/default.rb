@@ -1,38 +1,38 @@
 # Name of the cookbook (referenced in forwarder.rb)
-default['splunk']['cookbook_name']                = "splunk"
+default['splunk']['cookbook_name']             = "splunk"
 
 #directories
-default['splunk']['server_home']                  = "/opt/splunk"
-default['splunk']['db_directory']                 = "/volr/splunk"
+default['splunk']['server_home']               = "/opt/splunk"
+default['splunk']['db_directory']              = "/volr/splunk"
 
 #web config
-default['splunk']['web_server_port']              = "80" # Change to 443/other if you're doing ssl
-default['splunk']['browser_timeout']              = "0"
-default['splunk']['minify_js']                    = "true"
-default['splunk']['minify_css']                   = "true"
+default['splunk']['web_server_port']           = "80" # Change to 443/other if you're doing ssl
+default['splunk']['browser_timeout']           = "0"
+default['splunk']['minify_js']                 = "true"
+default['splunk']['minify_css']                = "true"
 
-default['splunk']['use_ssl']                      = false
-default['splunk']['ssl_crt']                      = "ssl.crt"
-default['splunk']['ssl_key']                      = "ssl.key"
+default['splunk']['use_ssl']                   = false
+default['splunk']['ssl_crt']                   = "ssl.crt"
+default['splunk']['ssl_key']                   = "ssl.key"
 
 # Dashboards to deploy
-default['splunk']['deploy_dashboards']            = true
-default['splunk']['dashboards_to_deploy']         = ["apache_http","useragents"]
+default['splunk']['deploy_dashboards']         = true
+default['splunk']['dashboards_to_deploy']      = ["apache_http","useragents"]
 
 
-default['splunk']['server_config_folder']		  = "prodlike"
+default['splunk']['server_config_folder']      = "prodlike"
 
 # Static Server Configs (Configs that match regardless of environment -Dev,QA,PL,Prod,Etc)
-default['splunk']['static_server_configs']        = ["web","transforms"]
+default['splunk']['static_server_configs']     = ["web","transforms"]
 
 # Dynamic Server Configs (Configs that change per environment)
-default['splunk']['dynamic_server_configs']       = ["inputs","props"]
+default['splunk']['dynamic_server_configs']    = ["inputs","props"]
 
 #configuration values for forwarders
-default['splunk']['receiver_port']                = "9997"
+default['splunk']['receiver_port']             = "9997"
 
 #Change the default admin password (Username::Password)
-default['splunk']['auth']                         = "admin:SomePassword123!!"
+default['splunk']['auth']                      = "admin:SomePassword123"
 
 #Set the role of your splunk indexer
-default['splunk']['server_role']                  = "splunk-server"
+default['splunk']['server_role']               = "splunk-server"
