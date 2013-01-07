@@ -99,6 +99,10 @@ forwarder
 	- File location: files/default/ssl/forwarders
 * `node['splunk']['ssl_forwarding_pass']` - Password for the certs
 
+indexes
+-------
+* `node['splunk']['indexes']` - Hash of index information.  Each key is a corresponding key in indexes.conf
+
 scripted_auth
 -------------
 

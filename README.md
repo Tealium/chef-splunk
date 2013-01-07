@@ -6,6 +6,7 @@ This Chef cookbook provides recipes for installing Splunk Server, Splunk Forward
 Changes
 =======
 
+* v0.1.0 - Added index configuration.  See attributes/indexes.rb
 * v0.0.9 -
     - Added Distributed Searching.  This requires an Enterprise License with the CanBeRemoteMaster / DistSearch Feature Flags.  See the Distributed Search section for more details.
 * v0.0.8 -
