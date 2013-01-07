@@ -3,7 +3,7 @@ default['splunk']['unix_app_file']                = "unix.tar.gz"
 default['splunk']['unix_app_version']             = "4.6"
 
 # Deployment Monitor Version Number
-default['splunk']['deployment_mon_file']          = "SplunkDeploymentMonitor.tar.gz"
+default['splunk']['deployment_mon_file']          = "splunk_deployment_monitor.tar.gz"
 default['splunk']['deployment_mon_version']       = "5.0.0"
 
 # Splunk SOS app
