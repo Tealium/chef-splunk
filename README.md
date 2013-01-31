@@ -113,7 +113,9 @@ This will tell the forwarder to look for a splunk_chef_server.inputs.conf.erb fi
 
 	recipe[splunk::server]
 	
-This will tell the splunk server to use the dynamic config files located in templates/default/server/SERVER_CONFIG_FOLDER
+To cause the Web interface, SplunkWeb, to be started, assign to the node the role designated in its node['splunk']['server_role'] attribute ("splunk-server" by default).  It will be available on port node['splunk']['web_server_port'].  See attributes/README.md under the "default" section for more options, including SSL support and the default administrator password.
+
+This will tell the splunk server to use the dynamic config files located in templates/default/server/SERVER_CONFIG_FOLDER:
 	
 	override_attributes(
 		"splunk" => {
