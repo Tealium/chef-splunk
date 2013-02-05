@@ -17,6 +17,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+service "splunk" do
+  action [ :nothing ]
+  supports  :status => true, :start => true, :stop => true, :restart => true
+end
 
 # True for both a Dedicated Search head for Distributed Search and for non-distributed search
 dedicated_search_head = true 
@@ -173,11 +177,6 @@ execute "Changing Admin Password" do
   end
 end
 
-service "splunk" do
-  action [ :start ]
-  supports  :status => true, :start => true, :stop => true, :restart => true
-end
-
 # Enable receiving ports only if we are a standalone installation or a dedicated_indexer
 if dedicated_indexer == true || node['splunk']['distributed_search'] == false
   execute "Enabling Receiver Port #{node['splunk']['receiver_port']}" do 
@@ -328,3 +327,7 @@ if node['splunk']['distributed_search'] == true
     end
   end
 end # End of distributed search
+
+service "splunk" do
+  action :start
+end
