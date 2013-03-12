@@ -139,19 +139,13 @@ end
    end
 end
 
-# Find the inputs file to move.  There will be the default and then we will over-write it as necessary
-node.cookbook_collection[node['splunk']['cookbook_name']].template_filenames.each do |filename|
- inputsfile = "forwarder/#{node['splunk']['forwarder_config_folder']}/#{node['splunk']['forwarder_role']}.inputs.conf.erb"
- if inputsfile == filename
-   template "Moving inputs file for role: #{node['splunk']['forwarder_role']}" do
- 	    path "#{node['splunk']['forwarder_home']}/etc/system/local/inputs.conf"
-	    source inputsfile
-      owner "root"
-      group "root"
-      mode "0640"
-      notifies :restart, resources(:service => "splunk")
-    end
-  end
+template "Moving inputs file for role: #{node['splunk']['forwarder_role']}" do
+  path "#{node['splunk']['forwarder_home']}/etc/system/local/inputs.conf"
+  source "forwarder/#{node['splunk']['forwarder_config_folder']}/#{node['splunk']['forwarder_role']}.inputs.conf.erb"
+  owner "root"
+  group "root"
+  mode "0640"
+  notifies :restart, resources(:service => "splunk")
 end
 
 
