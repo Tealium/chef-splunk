@@ -112,9 +112,11 @@ if node['splunk']['ssl_forwarding'] == true
     block do
       outputsPass = `grep -m 1 "sslPassword = " #{node['splunk']['forwarder_home']}/etc/system/local/outputs.conf | sed 's/sslPassword = //'`
       if outputsPass.match(/^\$1\$/) && outputsPass != node['splunk']['outputsSSLPass']
-        node['splunk']['outputsSSLPass'] = outputsPass
-        node.save
+        node.default['splunk']['outputsSSLPass'] = outputsPass
       end
+    end
+    only_if do
+      File.exists?("#{node['splunk']['forwarder_home']}/etc/system/local/outputs.conf")
     end
   end
 end
