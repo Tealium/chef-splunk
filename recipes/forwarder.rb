@@ -28,7 +28,7 @@ splunk_package_version = "splunkforwarder-#{node['splunk']['forwarder_version']}
 
 splunk_file = splunk_package_version + 
   case node['platform']
-  when "centos","redhat","fedora"
+  when "centos","redhat","fedora","amazon"
     if node['kernel']['machine'] == "x86_64"
       "-linux-2.6-x86_64.rpm"
     else
