@@ -125,7 +125,7 @@ template "#{node['splunk']['forwarder_home']}/etc/system/local/outputs.conf" do
 	group "root"
 	mode "0644"
 	variables :splunk_servers => splunk_servers
-	notifies :restart, resources(:service => "splunk")
+	notifies :restart, "service[splunk]"
 end
 
 ["limits"].each do |cfg|
