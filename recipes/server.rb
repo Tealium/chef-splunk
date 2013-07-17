@@ -64,24 +64,28 @@ package splunk_package_version do
 end
 
 if node['splunk']['distributed_search'] == true
-  # Add the Distributed Search Template
-  node['splunk']['static_server_configs'] << "distsearch"
-   
-  # We are a search head
-  if node.run_list.include?("role[#{node['splunk']['server_role']}]")
-    search_indexers = search(:node, "role:#{node['splunk']['indexer_role']}")
-    # Add an outputs.conf.  Search Heads should not be doing any indexing
-    node['splunk']['static_server_configs'] << "outputs"
-  else
-    dedicated_search_head = false
-  end
+	if Chef::Config[:solo]
+		Chef::Log.warn("This recipe uses search. Chef Solo does not support search.")
+	else
+	  # Add the Distributed Search Template
+	  node['splunk']['static_server_configs'] << "distsearch"
+	   
+	  # We are a search head
+	  if node.run_list.include?("role[#{node['splunk']['server_role']}]")
+	    search_indexers = search(:node, "role:#{node['splunk']['indexer_role']}")
+	    # Add an outputs.conf.  Search Heads should not be doing any indexing
+	    node['splunk']['static_server_configs'] << "outputs"
+	  else
+	    dedicated_search_head = false
+	  end
 
-  # we are a dedicated indexer
-  if node.run_list.include?("role[#{node['splunk']['indexer_role']}]")
-    # Find all search heads so we can move their trusted.pem files over
-    search_heads = search(:node, "role:#{node['splunk']['server_role']}")
-    dedicated_indexer = true
-  end
+	  # we are a dedicated indexer
+	  if node.run_list.include?("role[#{node['splunk']['indexer_role']}]")
+	    # Find all search heads so we can move their trusted.pem files over
+	    search_heads = search(:node, "role:#{node['splunk']['server_role']}")
+	    dedicated_indexer = true
+	  end
+	end
 end
 
 
