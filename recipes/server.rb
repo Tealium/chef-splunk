@@ -135,7 +135,7 @@ if node['splunk']['ssl_forwarding'] == true
       owner "root"
       group "root"
       mode "0755"
-      notifies :restart, resources(:service => "splunk")
+      notifies :restart, "service[splunk]"
     end
   end
 
@@ -236,7 +236,7 @@ node['splunk']['static_server_configs'].each do |cfg|
         :dedicated_search_head => dedicated_search_head,
         :dedicated_indexer => dedicated_indexer
       )
-    notifies :restart, resources(:service => "splunk")
+    notifies :restart, "service[splunk]"
   end
 end
 
@@ -246,7 +246,7 @@ node['splunk']['dynamic_server_configs'].each do |cfg|
    	owner "root"
    	group "root"
    	mode "0640"
-    notifies :restart, resources(:service => "splunk")
+    notifies :restart, "service[splunk]"
    end
 end
 
@@ -321,7 +321,7 @@ if node['splunk']['distributed_search'] == true
           mode "0600"
           content server['splunk']['trustedPem'].strip
           action :create
-          notifies :restart, resources(:service => "splunk")
+          notifies :restart, "service[splunk]"
         end
       end
     end
