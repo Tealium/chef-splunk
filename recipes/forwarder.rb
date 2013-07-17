@@ -101,7 +101,7 @@ if node['splunk']['ssl_forwarding'] == true
       owner "root"
       group "root"
       mode "0755"
-      notifies :restart, resources(:service => "splunk")
+      notifies :restart, "service[splunk]"
     end
   end
 
@@ -134,7 +134,7 @@ end
    	owner "root"
    	group "root"
    	mode "0640"
-    notifies :restart, resources(:service => "splunk")
+    notifies :restart, "service[splunk]"
    end
 end
 
@@ -144,7 +144,7 @@ template "Moving inputs file for role: #{node['splunk']['forwarder_role']}" do
   owner "root"
   group "root"
   mode "0640"
-  notifies :restart, resources(:service => "splunk")
+  notifies :restart, "service[splunk]"
 end
 
 
