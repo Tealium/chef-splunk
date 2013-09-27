@@ -1,7 +1,7 @@
 #
 # Cookbook Name:: splunk
 # Recipe:: forwarder
-# 
+#
 # Copyright 2011-2012, BBY Solutions, Inc.
 # Copyright 2011-2012, Opscode, Inc.
 #
@@ -26,7 +26,7 @@ end
 splunk_cmd = "#{node['splunk']['forwarder_home']}/bin/splunk"
 splunk_package_version = "splunkforwarder-#{node['splunk']['forwarder_version']}-#{node['splunk']['forwarder_build']}"
 
-splunk_file = splunk_package_version + 
+splunk_file = splunk_package_version +
   case node['platform']
   when "centos","redhat","fedora"
     if node['kernel']['machine'] == "x86_64"
@@ -94,7 +94,7 @@ if node['splunk']['ssl_forwarding'] == true
     group "root"
     action :create
   end
-  
+
   [node['splunk']['ssl_forwarding_cacert'],node['splunk']['ssl_forwarding_servercert']].each do |cert|
     cookbook_file "#{node['splunk']['forwarder_home']}/etc/auth/forwarders/#{cert}" do
       source "ssl/forwarders/#{cert}"
@@ -112,7 +112,7 @@ if node['splunk']['ssl_forwarding'] == true
     block do
       outputsPass = `grep -m 1 "sslPassword = " #{node['splunk']['forwarder_home']}/etc/system/local/outputs.conf | sed 's/sslPassword = //'`
       if outputsPass.match(/^\$1\$/) && outputsPass != node['splunk']['outputsSSLPass']
-        node['splunk']['outputsSSLPass'] = outputsPass
+        node.default['splunk']['outputsSSLPass'] = outputsPass
         node.save
       end
     end
