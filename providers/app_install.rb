@@ -74,7 +74,7 @@ def install_or_upgrade(app_file, app_version, directory_name, version_file, splu
       end
 
       execute "cd #{splunk_dir}/etc/apps; tar -zxvf #{app_file}" do
-        notifies :restart, resources(:service => "splunk")
+        notifies :restart, "service[splunk)"
       end
 
       directory "#{splunk_dir}/etc/apps/#{directory_name}/local" do
@@ -98,7 +98,7 @@ def move_local_templates(local_templates, local_templates_directory, directory_n
         	owner "root"
         	group "root"
         	mode "0640"
-        	notifies :restart, resources(:service => "splunk")
+       		notifies :restart, "service[splunk]"
        end
        
     end
