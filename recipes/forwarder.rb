@@ -28,7 +28,7 @@ splunk_package_version = "splunkforwarder-#{node['splunk']['forwarder_version']}
 
 splunk_file = splunk_package_version +
   case node['platform']
-  when "centos","redhat","fedora"
+  when "centos","redhat","fedora","amazon"
     if node['kernel']['machine'] == "x86_64"
       "-linux-2.6-x86_64.rpm"
     else
@@ -113,8 +113,10 @@ if node['splunk']['ssl_forwarding'] == true
       outputsPass = `grep -m 1 "sslPassword = " #{node['splunk']['forwarder_home']}/etc/system/local/outputs.conf | sed 's/sslPassword = //'`
       if outputsPass.match(/^\$1\$/) && outputsPass != node['splunk']['outputsSSLPass']
         node.default['splunk']['outputsSSLPass'] = outputsPass
-        node.save
       end
+    end
+    only_if do
+      File.exists?("#{node['splunk']['forwarder_home']}/etc/system/local/outputs.conf")
     end
   end
 end
